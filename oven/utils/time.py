@@ -35,7 +35,7 @@ def seconds_to_adaptive_time_cost(seconds: int) -> str:
     if seconds > 0:
         parts.append(f'{seconds}s')
     # Concatenate the parts.
-    if len(parts > 0):
+    if len(parts) > 0:
         time_cost = ' '.join(parts)
     else:
         time_cost = '<1s'
