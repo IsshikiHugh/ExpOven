@@ -1,11 +1,19 @@
 import sys
 
 
+def _get_cli_tails() -> str:
+    """Get the tail of the command line arguments."""
+    tail = ''
+    for arg in sys.argv[1:]:
+        tail = f'{tail} "{arg}"'  # the double quotes are necessary
+    return tail.strip()
+
+
 def ding() -> None:
     """CLI command `ding`."""
     import oven
 
-    log = ' '.join(sys.argv[1:])
+    log = _get_cli_tails()
     return oven.notify(log)
 
 
@@ -13,7 +21,7 @@ def bake() -> None:
     """CLI command `bake`."""
     import oven
 
-    cmd = ' '.join(sys.argv[1:])
+    cmd = _get_cli_tails()
     return oven.get_lazy_oven().ding_cmd(cmd)
 
 
@@ -31,13 +39,9 @@ def oven() -> None:
 
         print_manual()
     elif action == 'ding':
-        import oven
-
-        oven.notify(' '.join(args))
+        ding()
     elif action == 'bake':
-        import oven
-
-        oven.get_lazy_oven().ding_cmd(' '.join(args))
+        bake()
     elif action == 'init-cfg':
         from oven.utils import dump_cfg_temp
 
