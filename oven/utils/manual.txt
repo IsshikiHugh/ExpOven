@@ -19,7 +19,8 @@ Full:
                                  eg: oven ding "Hello World!"
       bake <command>             The same as the shortcut "bake".
                                  eg: oven bake python train.py --exp_name='debug'
-      init-cfg                   Create and initialize the configuration file.
+      init-cfg                   Create and initialize the configuration file if the file
+                                 does not exist.
       reset-cfg                  Overwrite and reset the configuration file.
       toggle-backend <backend>   Toggle the backend of the notifier.
       home                       Display the detected home directory.

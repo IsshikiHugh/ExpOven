@@ -2,41 +2,77 @@
 
 <center><img src="https://github.com/user-attachments/assets/c478b73c-4f7b-4b7d-bd26-28522892fb98"></center>
 
+<center>
+
+[🍞 Installation](#installation)
+|
+[🍕 Quick Start](#quick-start)
+|
+[🧅 Contribution](./docs/CONTRIBUTING.md)
+</center>
+
 ExpOven is a notifier application mainly designed for AI researchers. It provides a simple and efficient way to monitor the status of experiments opportunely.
 
 You execute your experiments or commands on the server. When the command is completed or encounters an issue, you will receive a notification in your messaging apps (such as DingTalk, email, Slack, etc.). Additionally, you can use this tool to track the progress of the experiments.
 
 ## Installation
 
-### Step 0. Third Party Setup
-
-- [DingTalk](./docs/third_party_setup/dingtalk.md)
-- [Feishu(Lark)](./docs/third_party_setup/feishu.md)
-- [Email](./docs/third_party_setup/email.md)
-- [Bark](./docs/third_party_setup/bark.md)
 ### Step 1. Install Package
 
-You can clone the repo and install the package with:
+```shell
+pip install exp-oven
+```
+</details>
+
+<details><summary>📌 Option 2. Install from GitHub.</summary>
+
+```shell
+pip install git+https://github.com/IsshikiHugh/ExpOven
+```
+</details>
+
+<details><summary>📌 Option 3. Install locally.</summary>
 
 ```shell
 git clone https://github.com/IsshikiHugh/ExpOven.git
 cd ExpOven
 pip install .  # Make sure you are in the (virtual) environment that you want to install ExpOven.
 ```
+</details><br/>
 
-Or simply install with:
+After installation, you can check if the installation is successful by typing the following command:
 
 ```shell
-pip install git+https://github.com/IsshikiHugh/ExpOven
+oven help
 ```
 
-### Step 2. Edit Configuration
+### Step 2. Setup & Configuration
 
-After finishing installation, you need to edit the configuration file. The default configuration file is located at `~/.config/oven/cfg.yaml`. You can also specify the configuration file by setting the environment variable `OVEN_HOME`. If the environment variable is set, the configuration file will be located at `$OVEN_HOME/cfg.yaml`.
+Now you need to configuration the third-party supports. You can only configure the most commonly used ones. Check the following links for more details:
 
-The template of the config file is given at [docs/cfg.yaml.temp](./docs/cfg.yaml.temp).
+- [DingTalk](./docs/third_party_setup/dingtalk.md)
+- [Feishu(Lark)](./docs/third_party_setup/feishu.md)
+- [Email](./docs/third_party_setup/email.md)
+- [Bark](./docs/third_party_setup/bark.md)
 
-The things to be filled can be found in **[Step 0](#step-0-third-party-setup)**.
+Next, you need to edit the local configuration file.
+
+<details> <summary>📌 About Config File Location</summary>
+
+> The configuration file will be created at `$OVEN_HOME/cfg.yaml`, the default value of `OVEN_HOME` is `~/.config/oven`.
+>
+> You can check the current `OVEN_HOME` through CLI `oven home`.
+>
+> To customize `OVEN_HOME`, you only need to set the environment variable `OVEN_HOME` to the desired path.
+</details><br/>
+
+
+```shell
+oven init-cfg  # Configuration template will be created at $OVEN_HOME/cfg.yaml.
+```
+
+The template of the config file will be synced from [docs/cfg.yaml.temp](./docs/cfg.yaml.temp).
+
 
 ## Quick Start
 

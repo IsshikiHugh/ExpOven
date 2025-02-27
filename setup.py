@@ -11,7 +11,8 @@ setup(
     author_email='',
     packages=find_packages(),
     package_dir={'oven': 'oven'},
-    package_data={'oven': ['manual.txt']},
+    package_data={'oven': ['utils/manual.txt']},
+    include_package_data=True,
     description='Experiments monitor and notification utilities.',
     classifiers=[
         'Programming Language :: Python :: 3',

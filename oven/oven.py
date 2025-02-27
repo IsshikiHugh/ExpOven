@@ -91,7 +91,6 @@ class Oven:
             exp_info.update_signal(
                 signal=Signal.E, description=f'Command error detected: {e}'
             )
-            raise e
 
         # Experiment finished.
         exp_info.update_signal(signal=Signal.T)

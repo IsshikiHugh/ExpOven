@@ -1,6 +1,15 @@
+# Dev
 .vscode
+.DS_Store
+__pycache__
+
+# Package
+*.egg-info
+
+# PyPI
+dist
+build
+
+# Misc
 config.yaml
 cfg.yaml
-__pycache__
-*.egg-info
-.DS_Store

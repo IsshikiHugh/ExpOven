@@ -34,6 +34,7 @@ def dump_cfg_temp(overwrite: bool = False) -> Union[str, Path]:
         print(f'File already exists: {path}')
     else:
         print(f'Dumping config template to: {path}')
+        path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, 'w') as f:
             f.write(get_cfg_temp())
     return path
