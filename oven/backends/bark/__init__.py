@@ -10,18 +10,12 @@ from oven.backends.api import NotifierBackendBase, RespStatus
 from .info import BarkExpInfo, BarkLogInfo
 
 
-VALID_LEVELS = ['active', 'timeSensitive', 'passive', 'critical']
-
-
 class BarkBackend(NotifierBackendBase):
     def __init__(self, cfg: Dict):
         # Validate the configuration.
         assert (
             'device_token' in cfg and '<?>' not in cfg['device_token']
         ), 'Please ensure the validity of "bark.device_token" field in the configuration file!'
-        assert (
-            'level' in cfg and cfg['level'] in VALID_LEVELS
-        ), 'Please ensure the validity of "bark.level" field in the configuration file!'
         assert (
             'group' in cfg and '<?>' not in cfg['group']
         ), 'Please ensure the validity of "bark.group" field in the configuration file!'
@@ -32,18 +26,8 @@ class BarkBackend(NotifierBackendBase):
         # Setup.
         self.cfg = cfg
         self.device_token = cfg['device_token']
-        self.url = 'https://api.day.app/' + self.device_token
+        self.target_address = 'https://api.day.app/' + self.device_token
         self.icon = ''   # TODO: add icon support.
-
-    def _gen_sign(self, secret):
-        timestamp = int(datetime.now().timestamp())
-        string_to_sign = '{}\n{}'.format(timestamp, secret)
-
-        hmac_code = hmac.new(
-            string_to_sign.encode('utf-8'), digestmod=hashlib.sha256
-        ).digest()
-        sign = base64.b64encode(hmac_code).decode('utf-8')
-        return sign
 
     def notify(self, info: BarkExpInfo):
         """
@@ -55,18 +39,18 @@ class BarkBackend(NotifierBackendBase):
 
         payload = {
             'title': formatted_data['title'],
-            'subtitle': formatted_data['subtitle'],
             'body': formatted_data['content'],
             'group': self.cfg['group'],
             'icon': self.icon,
             'url': self.cfg['url'],
+            'level': formatted_data['level'],
         }
         if '<?>' in self.cfg['url']:
             payload.pop('url')
         # 2. Post request and get response.
         has_err, err_msg = False, ''
         try:
-            resp = requests.post(self.url, json=payload)
+            resp = requests.post(self.target_address, json=payload)
             resp_dict = json.loads(resp.text)
             has_err, err_msg = self._parse_resp(resp_dict)
         except Exception as e:

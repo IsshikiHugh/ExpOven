@@ -19,10 +19,19 @@ class BarkExpInfo(ExpInfoBase):
 
     def format_information(self) -> dict:
         # Never send empty paragraph, it would be ugly.
+
+        # Notification level.
+        if self.current_signal == Signal.T:
+            noti_level = 'active'
+        elif self.current_signal == Signal.E:
+            noti_level = 'timeSensitive'   # or "critical" if timeSensitive is not working.
+        else:
+            noti_level = 'passive'
+
         information = {
-            'title': f'{self.readable_time} @ {self.host}',
-            'subtitle': self.exp_info,
+            'title': self.exp_info,
             'content': self.aux_info + self.current_description,
+            'level': noti_level,
         }
         return information
 
@@ -103,9 +112,9 @@ class BarkLogInfo(LogInfoBase, BarkExpInfo):
 
     def format_information(self) -> dict:
         information = {
-            'title': f'{self.readable_time} @ {self.host}',
-            'subtitle': '',
+            'title': f'ExpOven Notification',
             'content': self.current_description,
+            'level': 'passive',
         }
         return information
 
