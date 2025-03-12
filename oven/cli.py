@@ -15,7 +15,7 @@ def _get_baking_cmd(args_offset) -> str:
     return cmd.strip()
 
 
-def ding(args_offset:int=1) -> None:
+def ding(args_offset: int = 1) -> None:
     """CLI command `ding`."""
     import oven
 
@@ -23,7 +23,7 @@ def ding(args_offset:int=1) -> None:
     return oven.get_lazy_oven().ding_log(log)
 
 
-def bake(args_offset:int=1) -> None:
+def bake(args_offset: int = 1) -> None:
     """CLI command `bake`."""
     import oven
 
