@@ -19,10 +19,6 @@ You execute your experiments or commands on the server. When the command is comp
 
 ### Step 1. Install Package
 
-Like most python packages, you can install ExpOven via following methods:
-
-<details><summary>📌 Option 1. Install from PyPI. <b>[RECOMMENDED]</b></summary>
-
 ```shell
 pip install exp-oven
 ```
@@ -57,6 +53,7 @@ Now you need to configuration the third-party supports. You can only configure t
 - [DingTalk](./docs/third_party_setup/dingtalk.md)
 - [Feishu(Lark)](./docs/third_party_setup/feishu.md)
 - [Email](./docs/third_party_setup/email.md)
+- [Bark](./docs/third_party_setup/bark.md)
 
 Next, you need to edit the local configuration file.
 
