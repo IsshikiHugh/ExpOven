@@ -100,7 +100,7 @@ bake [RUNNABLE COMMAND]
 bake echo 'Hello World!'
 bake pip install -r requirements.txt
 bake bash scripts/download_data.sh
-bake CUDA_VISIBLE_DEVICES='0,1' python train.py
+CUDA_VISIBLE_DEVICES='0,1' bake python train.py
 ```
 
 <center><img src="docs/eg_bake_dingtalk.png" width="50%"></center>
