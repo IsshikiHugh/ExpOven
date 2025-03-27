@@ -1,27 +1,34 @@
 import sys
 
 
-def _get_cli_tails() -> str:
+def _get_baking_cmd(args_offset) -> str:
     """Get the tail of the command line arguments."""
-    tail = ''
-    for arg in sys.argv[1:]:
-        tail = f'{tail} "{arg}"'  # the double quotes are necessary
-    return tail.strip()
+    cmd = ''
+    is_leading_env = True
+    for arg in sys.argv[args_offset:]:
+        if '=' in arg and is_leading_env:
+            cmd = f'{cmd} {arg}'
+        else:
+            is_leading_env = False
+            cmd = f'{cmd} "{arg}"'  # the double quotes are necessary
+
+    return cmd.strip()
 
 
-def ding() -> None:
+def ding(args_offset: int = 1) -> None:
     """CLI command `ding`."""
     import oven
 
-    log = _get_cli_tails()
-    return oven.notify(log)
+    log = ' '.join(sys.argv[args_offset:])
+    return oven.get_lazy_oven().ding_log(log)
 
 
-def bake() -> None:
+def bake(args_offset: int = 1) -> None:
     """CLI command `bake`."""
     import oven
 
-    cmd = _get_cli_tails()
+    cmd = _get_baking_cmd(args_offset)
+    print(cmd)
     return oven.get_lazy_oven().ding_cmd(cmd)
 
 
@@ -39,9 +46,9 @@ def oven() -> None:
 
         print_manual()
     elif action == 'ding':
-        ding()
+        ding(args_offset=2)
     elif action == 'bake':
-        bake()
+        bake(args_offset=2)
     elif action == 'init-cfg':
         from oven.utils import dump_cfg_temp
 
