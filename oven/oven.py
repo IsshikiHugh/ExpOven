@@ -69,7 +69,7 @@ class Oven:
                     signal=Signal.E,
                     description=f'Function internal exception detected: {e}',
                 )
-                raise e
+                return None
 
             # Experiment finished.
             exp_info.update_signal(signal=Signal.T)
@@ -91,6 +91,7 @@ class Oven:
             exp_info.update_signal(
                 signal=Signal.E, description=f'Command error detected: {e}'
             )
+            return None
 
         # Experiment finished.
         exp_info.update_signal(signal=Signal.T)
