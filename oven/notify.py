@@ -1,48 +1,39 @@
-# notify.py
-import os
+#import os
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
-SLACK_CHANNEL_ID = os.getenv('SLACK_CHANNEL_ID')
 
+class SlackNotifier:
+    def __init__(self, bot_token=None, channel_id=None):
+        self.bot_token = bot_token or os.getenv('SLACK_BOT_TOKEN')
+        self.channel_id = channel_id or os.getenv('SLACK_CHANNEL_ID')
+        self.base_url = 'https://slack.com/api'
 
-def send_slack_message(message: str):
-    headers = {
-        'Authorization': f'Bearer {SLACK_BOT_TOKEN}',
-        'Content-Type': 'application/json',
-    }
+        self.headers = {
+            'Authorization': f'Bearer {self.bot_token}',
+            'Content-Type': 'application/json',
+        }
 
-    data = {'channel': SLACK_CHANNEL_ID, 'text': message}
+    def send_message(self, message: str) -> dict:
+        data = {'channel': self.channel_id, 'text': message}
+        response = requests.post(
+            f'{self.base_url}/chat.postMessage',
+            json=data,
+            headers=self.headers
+        )
+        return response.json()
 
-    response = requests.post(
-        'https://slack.com/api/chat.postMessage', json=data, headers=headers
-    )
-    return response.json()
-
-
-# You can update an existing message by using the message ts value:
-
-
-# Send the initial message
-response = send_slack_message('🔄 Processing task...')
-
-# Get timestamp to update later
-ts = response.get('ts')
-
-# Update the message after progress
-update_data = {
-    'channel': SLACK_CHANNEL_ID,
-    'ts': ts,
-    'text': ' Task 50% complete',
-}
-requests.post(
-    'https://slack.com/api/chat.update',
-    json=update_data,
-    headers={
-        'Authorization': f'Bearer {SLACK_BOT_TOKEN}',
-        'Content-Type': 'application/json',
-    },
-)
+    def update_message(self, ts: str, new_text: str) -> dict:
+        data = {
+            'channel': self.channel_id,
+            'ts': ts,
+            'text': new_text,
+        }
+        response = requests.post(
+            f'{self.base_url}/chat.update',
+            json=data,
+            headers=self.headers
+        )
+        return response.json()
