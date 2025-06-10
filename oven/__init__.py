@@ -63,7 +63,14 @@ ding = notify  # oven.ding(...) = oven.notify(...)
 # Progress tracking functions
 # These provide tqdm-like functionality with ExpOven notification support
 __all__ = [
-    'monitor', 'notify', 'bake', 'ding',
-    'progress', 'progress_range', 'ProgressBar',
-    'get_lazy_oven', 'Oven', 'build_oven'
+    'monitor',
+    'notify',
+    'bake',
+    'ding',
+    'progress',
+    'progress_range',
+    'ProgressBar',
+    'get_lazy_oven',
+    'Oven',
+    'build_oven',
 ]
