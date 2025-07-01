@@ -132,6 +132,16 @@ class Oven:
             self.ExpInfoClass = EmailExpInfo
             self.LogInfoClass = EmailLogInfo
             self.backend = EmailBackend(self.cfg)
+        elif backend == 'bark':
+            from oven.backends.bark import (
+                BarkBackend,
+                BarkExpInfo,
+                BarkLogInfo,
+            )
+
+            self.ExpInfoClass = BarkExpInfo
+            self.LogInfoClass = BarkLogInfo
+            self.backend = BarkBackend(self.cfg)
         else:
             self.ExpInfoClass = ...
             self.LogInfoClass = ...
