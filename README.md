@@ -15,8 +15,6 @@ ExpOven is a notifier application mainly designed for AI researchers. It provide
 
 You execute your experiments or commands on the server. When the command is completed or encounters an issue, you will receive a notification in your messaging apps (such as DingTalk, email, Slack, etc.). Additionally, you can use this tool to track the progress of the experiments.
 
-**🆕 New Feature**: ExpOven now includes a **tqdm-like progress interface** that displays progress bars in terminal AND sends real-time progress notifications to your messaging apps!
-
 ## Installation
 
 ### Step 1. Install Package
@@ -152,7 +150,7 @@ def train() -> None:
         train_after_epoch()
 ```
 
-### Progress Tracking (NEW!)
+### Progress Tracking
 
 Track progress with tqdm-like interface that also sends notifications:
 
@@ -175,6 +173,7 @@ with oven.ProgressBar(total=1000, desc="Custom task") as pbar:
         pbar.update(10)  # Update by 10 items
 ```
 
+Check [docs/pbar_interface.md](./docs/pbar_interface.md) for more information about the API.
 
 ## Contributing
 

@@ -5,6 +5,7 @@ ExpOven now includes a **tqdm-like progress interface** that not only displays p
 ## Overview
 
 The progress interface provides:
+
 - **Terminal progress bars** similar to tqdm
 - **Real-time notifications** to messaging apps
 - **Two notification modes**: HTTP-based (time intervals) and Socket-based (trigger-based)
@@ -41,7 +42,7 @@ with oven.ProgressBar(total=200, desc="Manual updates") as pbar:
 ```python
 # HTTP mode: sends notifications at regular time intervals
 for i in oven.progress_range(
-    100, 
+    100,
     desc="Long running task",
     notify_mode="http",
     notify_interval=30.0,  # Notify every 30 seconds
@@ -52,7 +53,7 @@ for i in oven.progress_range(
 # Socket mode: sends notifications on manual triggers
 with oven.ProgressBar(
     total=100,
-    desc="Batch processing", 
+    desc="Batch processing",
     notify_mode="socket",
     notify_threshold=0.05  # Notify on 5% progress changes
 ) as pbar:
@@ -69,6 +70,7 @@ with oven.ProgressBar(
 Wrap an iterable with a progress bar.
 
 **Parameters:**
+
 - `iterable`: The iterable to wrap
 - `desc`: Description prefix for the progress bar
 - `total`: Total number of iterations (auto-detected for most iterables)
@@ -87,6 +89,7 @@ Shortcut for `oven.progress(range(*args), **kwargs)`.
 Manual progress bar for custom update patterns.
 
 **Methods:**
+
 - `update(n)`: Update progress by n steps
 - `set_description(desc)`: Change the description
 - `set_postfix(**kwargs)`: Set postfix values
@@ -109,6 +112,7 @@ for i in oven.progress_range(
 ```
 
 **Characteristics:**
+
 - Notifications sent on time intervals
 - Background thread handles notifications
 - Good for long-running tasks
@@ -129,6 +133,7 @@ with oven.ProgressBar(
 ```
 
 **Characteristics:**
+
 - Notifications sent on manual updates
 - Immediate feedback on progress changes
 - Good for interactive tasks
@@ -143,13 +148,13 @@ with oven.ProgressBar(
 progress_bar = oven.ProgressBar(
     total=1000,
     desc="Custom task",
-    
+
     # Notification settings
     notify_mode="http",           # or "socket"
     notify_interval=30.0,         # seconds (HTTP mode)
     notify_threshold=0.05,        # 5% progress change
     enable_notifications=True,    # enable/disable notifications
-    
+
     # Standard tqdm settings
     unit="items",
     unit_scale=True,
@@ -181,7 +186,7 @@ def train_model(epochs=100):
         # Training logic
         train_loss = train_epoch()
         val_loss = validate_epoch()
-        
+
         # Update progress with metrics
         if hasattr(oven, '_current_progress'):
             oven._current_progress.set_postfix(
@@ -199,7 +204,7 @@ def process_files(file_list):
     # Process files with progress tracking
     for file_path in oven.progress(file_list, desc="Processing files"):
         process_file(file_path)
-    
+
     # Batch processing with manual updates
     with oven.ProgressBar(total=len(file_list), desc="Post-processing") as pbar:
         for i in range(0, len(file_list), 10):  # Process in batches of 10
@@ -216,7 +221,7 @@ import oven
 def run_experiment():
     # Long experiment with periodic notifications
     for trial in oven.progress_range(
-        1000, 
+        1000,
         desc="Running experiment",
         notify_mode="http",
         notify_interval=300,  # Notify every 5 minutes
