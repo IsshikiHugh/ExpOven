@@ -150,6 +150,30 @@ def train() -> None:
         train_after_epoch()
 ```
 
+### Progress Tracking
+
+Track progress with tqdm-like interface that also sends notifications:
+
+```py
+import oven
+
+# Simple progress bar with notifications
+for i in oven.progress_range(100, desc="Training"):
+    train_step(i)
+
+# Wrap any iterable
+data = load_dataset()
+for batch in oven.progress(data, desc="Processing batches"):
+    process_batch(batch)
+
+# Manual progress updates
+with oven.ProgressBar(total=1000, desc="Custom task") as pbar:
+    for i in range(100):
+        do_work()
+        pbar.update(10)  # Update by 10 items
+```
+
+Check [docs/pbar_interface.md](./docs/pbar_interface.md) for more information about the API.
 
 ## Contributing
 
