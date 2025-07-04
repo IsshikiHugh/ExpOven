@@ -15,9 +15,7 @@ def _get_baking_cmd(args_offset) -> str:
             cmd_terms.pop(0)
         else:
             break
-    cmd = ' '.join(env_vars) \
-        + ' ; ' \
-        + ' '.join(cmd_terms)
+    cmd = ' '.join(env_vars) + ' ; ' + ' '.join(cmd_terms)
     return cmd.strip()
 
 
