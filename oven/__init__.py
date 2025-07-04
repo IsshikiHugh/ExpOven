@@ -46,11 +46,11 @@ def notify(msg: str) -> None:
 
     Usage:
     ```
-    @oven.notify('Hello World!')
+    oven.notify('Hello World!')
     ```
     It's equivalent to:
     ```
-    @oven.ding('Hello World!')
+    oven.ding('Hello World!')
     ```
     """
     return get_lazy_oven().ding_log(msg)

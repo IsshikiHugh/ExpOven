@@ -1,6 +1,8 @@
 import time
 import threading
 from typing import Optional, Iterable, Dict
+
+from oven.utils.time import milliseconds_to_adaptive_time_cost
 from oven.backends.api import Signal
 
 
@@ -149,12 +151,8 @@ class ProgressBar:
 
     def _format_time(self, seconds: float) -> str:
         """Format time duration in human readable format."""
-        if seconds < 60:
-            return f'{seconds:.1f}s'
-        elif seconds < 3600:
-            return f'{seconds/60:.1f}m'
-        else:
-            return f'{seconds/3600:.1f}h'
+        formated_time = milliseconds_to_adaptive_time_cost(int(seconds * 1000))
+        return formated_time
 
     def _start_notify_thread(self):
         """Start background thread for HTTP-based notifications."""
