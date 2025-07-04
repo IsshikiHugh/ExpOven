@@ -45,6 +45,7 @@ def milliseconds_to_adaptive_time_cost(milliseconds: int) -> str:
         time_cost = '<1ms'
     return time_cost
 
+
 def seconds_to_adaptive_time_cost(seconds: int) -> str:
     time_cost = milliseconds_to_adaptive_time_cost(seconds * ms_per_s)
     if time_cost == '<1ms':

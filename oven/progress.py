@@ -5,6 +5,7 @@ from typing import Optional, Iterable, Dict
 from oven.utils.time import milliseconds_to_adaptive_time_cost
 from oven.backends.api import Signal
 
+
 class ProgressBar:
     """
     A tqdm-like progress bar that also sends notifications to messaging apps.
