@@ -5,7 +5,7 @@ with open('oven/version.py') as f:
     exec(f.read())
 
 setup(
-    name='exp-oven',
+    name='exp_oven',
     version=__version__,
     author='Yan XIA',
     author_email='',
