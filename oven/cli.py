@@ -3,15 +3,21 @@ import sys
 
 def _get_baking_cmd(args_offset) -> str:
     """Get the tail of the command line arguments."""
-    cmd = ''
-    is_leading_env = True
-    for arg in sys.argv[args_offset:]:
-        if '=' in arg and is_leading_env:
-            cmd = f'{cmd} {arg}'
-        else:
-            is_leading_env = False
-            cmd = f'{cmd} "{arg}"'  # the double quotes are necessary
+    # 1. Get the clean command.
+    cmd = ' '.join(sys.argv[args_offset:]).strip()
 
+    # 2. Parse the env variables and manually fix the priority.
+    env_vars = []
+    cmd_terms = cmd.split(' ')
+    for term in cmd.split(' '):
+        if '=' in term:
+            env_vars.append(term)
+            cmd_terms.pop(0)
+        else:
+            break
+    cmd = ' '.join(env_vars) \
+        + ' ; ' \
+        + ' '.join(cmd_terms)
     return cmd.strip()
 
 
@@ -28,7 +34,7 @@ def bake(args_offset: int = 1) -> None:
     import oven
 
     cmd = _get_baking_cmd(args_offset)
-    print(cmd)
+    print(f'🍞 Baking: {cmd}')
     return oven.get_lazy_oven().ding_cmd(cmd)
 
 
