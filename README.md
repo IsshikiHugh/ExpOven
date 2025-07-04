@@ -101,6 +101,11 @@ bake echo 'Hello World!'
 bake pip install -r requirements.txt
 bake bash scripts/download_data.sh
 bake CUDA_VISIBLE_DEVICES='0,1' python train.py
+bake 'curl -X GET https://someweb.com/api?x=y'
+# Tips: these two have different effects
+X=1 bake "X=2 echo $X"  # outputs 1
+X=1 bake 'X=2 echo $X'  # outputs 2
+# Check 3.1.2.2 @ https://www.gnu.org/software/bash/manual/bash.html
 ```
 
 <center><img src="docs/eg_bake_dingtalk.png" width="50%"></center>
