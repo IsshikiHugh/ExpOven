@@ -151,8 +151,8 @@ class ProgressBar:
 
     def _format_time(self, seconds: float) -> str:
         """Format time duration in human readable format."""
-        time = milliseconds_to_adaptive_time_cost(int(seconds * 1000))
-        return time
+        formated_time = milliseconds_to_adaptive_time_cost(int(seconds * 1000))
+        return formated_time
 
     def _start_notify_thread(self):
         """Start background thread for HTTP-based notifications."""
