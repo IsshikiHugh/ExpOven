@@ -15,7 +15,16 @@ def _get_baking_cmd(args_offset) -> str:
             cmd_terms.pop(0)
         else:
             break
-    cmd = ' '.join(env_vars) + ' ; ' + ' '.join(cmd_terms)
+
+    cmd = ''
+    if len(env_vars) > 0:
+        cmd += ' '.join(env_vars) + ' ; '
+
+    if len(cmd_terms) == 1 and cmd_terms[0] == '':
+        print('😵‍💫 No command to bake!')
+        exit(1)
+    cmd += ' '.join(cmd_terms)
+
     return cmd.strip()
 
 
