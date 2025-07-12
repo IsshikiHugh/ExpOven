@@ -1,0 +1,6 @@
+Flask
+requests
+python-dotenv
+omegaconf
+slack_sdk
+
