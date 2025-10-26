@@ -69,6 +69,7 @@ class Oven:
                     signal=Signal.E,
                     description=f'Function internal exception detected: {e}',
                 )
+                traceback.print_exc()
                 return None
 
             # Experiment finished.
@@ -91,6 +92,7 @@ class Oven:
             exp_info.update_signal(
                 signal=Signal.E, description=f'Command error detected: {e}'
             )
+            traceback.print_exc()
             return None
 
         # Experiment finished.
@@ -142,7 +144,8 @@ class Oven:
 
 
 def build_oven(
-    cfg_path: Union[Path, str] = None, raise_err: bool = False
+    cfg_path: Union[Path, str] = None,
+    raise_err: bool = False,
 ) -> Oven:
     cfg_path = get_cfg_path()
     oven = None
