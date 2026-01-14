@@ -39,7 +39,7 @@ class SlackExpInfo(ExpInfoBase):
                     'elements': [
                         {
                             'type': 'mrkdwn',
-                            'text': f'{self.readable_time} @ {self.host}',
+                            'text': f'[ {self.task_icon} ] {self.readable_time} @ {self.host}',
                         }
                     ],
                 },
@@ -150,7 +150,7 @@ class SlackLogInfo(LogInfoBase, SlackExpInfo):
                     'elements': [
                         {
                             'type': 'mrkdwn',
-                            'text': f'{self.readable_time} @ {self.host}',
+                            'text': f'[ {self.task_icon} ] {self.readable_time} @ {self.host}',
                         }
                     ],
                 },
