@@ -1,7 +1,16 @@
+import random
 import socket
-
 from typing import Optional, Dict
 from oven.utils.time import get_current_timestamp
+
+# fmt: off
+EMOJI_TASK_ICON_POOL = [
+    '🍎', '🍊', '🍌', '🍉', '🍇', '🍓', '🍍', '🍒', '🍑', '🍐', '🍋', '🥝', '🥥', '🥭',
+    '🥦', '🥕', '🌽', '🍆', '🍅', '🥔', '🍠', '🥬', '🥒', '🍄', '🫑', '🧅', '🧄',
+    '🌵', '🌲', '🌿', '🍀', '🍁', '🌸', '🌻', '☀️', '🌙', '🌈', '🌊',
+    '🔮', '💎', '👻', '👽', '🤖', '🎃', '🐙', '🦋', '🦖', '🦄', '🦜',
+]
+# fmt: on
 
 
 class Signal:
@@ -67,6 +76,7 @@ class ExpInfoBase:
         self.exp_meta_info = exp_meta_info
         self.current_signal = Signal.I
         self._safe_signal_handler()
+        self.task_icon = random.choice(EMOJI_TASK_ICON_POOL)
 
         # Start.
         self.current_signal = Signal.S
@@ -147,6 +157,7 @@ class LogInfoBase:
         self.exp_meta_info = exp_meta_info
         self.current_signal = Signal.I
         self._safe_signal_handler()
+        self.task_icon = '🔈'
 
         # Terminate early.
         self.current_signal = (

@@ -124,6 +124,16 @@ class Oven:
             self.ExpInfoClass = FeishuExpInfo
             self.LogInfoClass = FeishuLogInfo
             self.backend = FeishuBackend(self.cfg)
+        elif backend == 'slack':
+            from oven.backends.slack import (
+                SlackBackend,
+                SlackExpInfo,
+                SlackLogInfo,
+            )
+
+            self.ExpInfoClass = SlackExpInfo
+            self.LogInfoClass = SlackLogInfo
+            self.backend = SlackBackend(self.cfg)
         elif backend == 'email':
             from oven.backends.email import (
                 EmailBackend,

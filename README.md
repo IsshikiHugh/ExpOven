@@ -56,6 +56,7 @@ Now you need to configuration the third-party supports. You can only configure t
 
 - [DingTalk](./docs/third_party_setup/dingtalk.md)
 - [Feishu(Lark)](./docs/third_party_setup/feishu.md)
+- [Slack](./docs/third_party_setup/slack.md)
 - [Email](./docs/third_party_setup/email.md)
 
 Next, you need to edit the local configuration file.

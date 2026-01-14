@@ -9,7 +9,11 @@ from oven.utils.time import (
 
 def lines2reply(lines):
     """It changes lines to string block and add quotation mark at the beginning of each line."""
-    return '> ' + '\n>\n> '.join(lines).strip()
+    if len(lines) == 0 or lines == ['']:
+        reply = ''
+    else:
+        reply = '>' + '\n> '.join(lines).strip()
+    return reply
 
 
 def plain2md(text):
@@ -17,32 +21,48 @@ def plain2md(text):
     return text
 
 
-LINE_SPLIT = '\n\n'
+LINE_SPLIT = '\n'
 
 
-class DingTalkExpInfo(ExpInfoBase):
+class SlackExpInfo(ExpInfoBase):
 
     # ================ #
     # Pre-defined API. #
     # ================ #
 
-    def format_information(self) -> str:
-        # 1. Format meta information and time.
-        prefix = (
-            f'###### [ {self.task_icon} ] {self.readable_time} @ {self.host}'
-        )
-        # 2. Format current description information.
-        msg = self.current_description
-        # 3. Concatenate the above two information and return.
-        information = (
-            prefix
-            + LINE_SPLIT
-            + self.exp_info
-            + LINE_SPLIT
-            + self.aux_info
-            + LINE_SPLIT
-            + msg
-        )
+    def format_information(self) -> dict:
+        information = {
+            'blocks': [
+                # Meta information block.
+                {
+                    'type': 'context',
+                    'elements': [
+                        {
+                            'type': 'mrkdwn',
+                            'text': f'[ {self.task_icon} ] {self.readable_time} @ {self.host}',
+                        }
+                    ],
+                },
+            ],
+        }
+
+        # Content blocks.
+        info_lists = [self.exp_info, self.aux_info, self.current_description]
+        for info in info_lists:
+            if len(info) > 0:
+                information['blocks'].append(
+                    {
+                        'type': 'section',
+                        'text': {
+                            'type': 'mrkdwn',
+                            'text': info,
+                        },
+                    }
+                )
+
+        # Add divider block.
+        information['blocks'].append({'type': 'divider'})
+
         return information
 
     def custom_signal_handler(self) -> None:
@@ -52,7 +72,6 @@ class DingTalkExpInfo(ExpInfoBase):
             # Update the meta information to member variables.
             self.host = self.exp_meta_info['host']
             self.cmd = self.exp_meta_info['cmd']
-            self.sec_key = self.exp_meta_info['sec_key']
             return
 
         # Format the time anyway.
@@ -61,7 +80,7 @@ class DingTalkExpInfo(ExpInfoBase):
         # Format the information for later use.
         self.current_description = plain2md(self.current_description)
         if self.current_signal == Signal.S:
-            self.exp_info = f'🔥 `{self.cmd}`\n\n' + lines2reply(
+            self.exp_info = f'🔥 `{self.cmd}`\n' + lines2reply(
                 self.current_description.split('\n')
             )
             self.exp_info_backup = self.exp_info
@@ -69,13 +88,13 @@ class DingTalkExpInfo(ExpInfoBase):
         else:
             self.exp_info = lines2reply(self.exp_info_backup.split('\n'))
 
-            cost_info = f'⏱️ **Time Cost**: {seconds_to_adaptive_time_cost(self.current_timestamp - self.start_timestamp)}.'
+            cost_info = f'⏱️ *Time Cost*: {seconds_to_adaptive_time_cost(self.current_timestamp - self.start_timestamp)}.'
             if self.current_signal == Signal.P:
-                status_info = '🏃 **Running!**'
+                status_info = '🏃 *Running!*'
             elif self.current_signal == Signal.E:
-                status_info = '❌ **Error!**'
+                status_info = '❌ *Error!*'
             elif self.current_signal == Signal.T:
-                status_info = '🔔 Done!'
+                status_info = '🔔 *Done!*'
             else:
                 assert False, f'Unknown signal: {self.current_signal}'
 
@@ -87,7 +106,7 @@ class DingTalkExpInfo(ExpInfoBase):
 
     def get_title(self) -> str:
         """The title is necessary for DingTalk markdown message."""
-        return f'[{self.sec_key}] {self.readable_time} @ {self.host}'
+        return f'{self.readable_time} @ {self.host}'
 
     # ================ #
     # Utils functions. #
@@ -107,26 +126,43 @@ class DingTalkExpInfo(ExpInfoBase):
         validated_meta = {
             'host': host,
             'cmd': self.exp_meta_info['cmd'],
-            'sec_key': self.exp_meta_info['sec_key'],
         }
         return validated_meta
 
 
-class DingTalkLogInfo(LogInfoBase, DingTalkExpInfo):
+class SlackLogInfo(LogInfoBase, SlackExpInfo):
 
     # ================ #
     # Pre-defined API. #
     # ================ #
 
-    def format_information(self) -> str:
+    def format_information(self) -> dict:
         # 1. Format meta information and time.
-        prefix = (
-            f'###### [ {self.task_icon} ] {self.readable_time} @ {self.host}'
-        )
-        # 2. Format current description information.
-        msg = self.current_description
-        # 3. Concatenate the above two information and return.
-        information = prefix + LINE_SPLIT + msg
+        # prefix = f'###### {self.readable_time} @ {self.host}'
+        # # 2. Format current description information.
+        # msg = self.current_description
+        # # 3. Concatenate the above two information and return.
+        # information = prefix + LINE_SPLIT + msg
+        information = {
+            'blocks': [
+                {
+                    'type': 'context',
+                    'elements': [
+                        {
+                            'type': 'mrkdwn',
+                            'text': f'[ {self.task_icon} ] {self.readable_time} @ {self.host}',
+                        }
+                    ],
+                },
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': self.current_description,
+                    },
+                },
+            ],
+        }
         return information
 
     def custom_signal_handler(self) -> None:
@@ -135,7 +171,6 @@ class DingTalkLogInfo(LogInfoBase, DingTalkExpInfo):
             self.exp_meta_info = self._init_meta()
             # Update the meta information to member variables.
             self.host = self.exp_meta_info['host']
-            self.sec_key = self.exp_meta_info['sec_key']
             return
 
         # Format the time anyway.
