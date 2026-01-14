@@ -1,3 +1,0 @@
-# Slack Backend
-
-Help wanted.
