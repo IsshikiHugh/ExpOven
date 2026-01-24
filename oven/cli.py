@@ -3,28 +3,7 @@ import sys
 
 def _get_baking_cmd(args_offset) -> str:
     """Get the tail of the command line arguments."""
-    # 1. Get the clean command.
     cmd = ' '.join(sys.argv[args_offset:]).strip()
-
-    # 2. Parse the env variables and manually fix the priority.
-    env_vars = []
-    cmd_terms = cmd.split(' ')
-    for term in cmd.split(' '):
-        if '=' in term:
-            env_vars.append(term)
-            cmd_terms.pop(0)
-        else:
-            break
-
-    cmd = ''
-    if len(env_vars) > 0:
-        cmd += ' '.join(env_vars) + ' ; '
-
-    if len(cmd_terms) == 1 and cmd_terms[0] == '':
-        print('😵‍💫 No command to bake!')
-        exit(1)
-    cmd += ' '.join(cmd_terms)
-
     return cmd.strip()
 
 
