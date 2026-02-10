@@ -1,9 +1,10 @@
 import sys
+import shlex
 
 
 def _get_baking_cmd(args_offset) -> str:
     """Get the tail of the command line arguments."""
-    cmd = ' '.join(sys.argv[args_offset:]).strip()
+    cmd = shlex.join(sys.argv[args_offset:])
     return cmd.strip()
 
 
