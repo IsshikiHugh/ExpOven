@@ -2,7 +2,6 @@
 .vscode
 .DS_Store
 __pycache__
-CLAUDE.md
 
 # Package
 *.egg-info
