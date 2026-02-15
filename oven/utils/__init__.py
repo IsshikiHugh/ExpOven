@@ -1,14 +1,15 @@
 import os
-from typing import Union
 from pathlib import Path
-from omegaconf import OmegaConf
 
-from .cfg import (
-    get_cfg_temp,
-    modify_cfg_with_new_backend,
-    get_latest_cfg_version,
-)
 from .version import get_latest_oven_version
+
+
+_TEMPLATES_DIR = Path(__file__).parent.parent / 'templates'
+
+
+def _read_bundled_template(filename: str) -> str:
+    """Read a bundled template file from oven/templates/."""
+    return (_TEMPLATES_DIR / filename).read_text()
 
 
 def get_home_path() -> Path:
@@ -22,27 +23,87 @@ def get_home_path() -> Path:
     return home_path
 
 
-def get_cfg_path() -> Path:
-    return get_home_path() / 'cfg.yaml'
+def get_meta_cfg_path() -> Path:
+    return get_home_path() / 'config.yaml'
 
 
-def dump_cfg_temp(overwrite: bool = False) -> Union[str, Path]:
-    """Download the config template according to latest configuration schema."""
-    path = get_cfg_path()
-
-    if not overwrite and Path(path).exists():
-        print(f'File already exists: {path}')
-    else:
-        print(f'Dumping config template to: {path}')
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, 'w') as f:
-            f.write(get_cfg_temp())
-    return path
+def get_groups_dir() -> Path:
+    return get_home_path() / 'ogroups'
 
 
-def toggle_backend(backend: str) -> None:
-    cfg_fn = get_cfg_path()
-    modify_cfg_with_new_backend(cfg_fn, backend)
+def dump_cfg_temp(overwrite: bool = False) -> None:
+    """Create config.yaml + ogroups/default.yaml from bundled templates."""
+    home = get_home_path()
+    meta_path = home / 'config.yaml'
+    groups_dir = home / 'ogroups'
+    default_group_path = groups_dir / 'default.yaml'
+
+    if not overwrite and meta_path.exists() and default_group_path.exists():
+        print(f'Config already exists at: {home}')
+        return
+
+    print(f'Dumping config to: {home}')
+    groups_dir.mkdir(parents=True, exist_ok=True)
+
+    meta_path.write_text(_read_bundled_template('config.yaml.temp'))
+    default_group_path.write_text(_read_bundled_template('group.yaml.temp'))
+
+    print(f'  Created: {meta_path}')
+    print(f'  Created: {default_group_path}')
+
+
+def set_default(group_name: str) -> None:
+    """Set the default notification group."""
+    groups_dir = get_groups_dir()
+    group_path = groups_dir / f'{group_name}.yaml'
+    if not group_path.exists():
+        print(
+            f'Group "{group_name}" not found. ' f'Expected file: {group_path}'
+        )
+        return
+
+    meta_path = get_meta_cfg_path()
+    meta_path.write_text(f'default: {group_name}\n')
+    print(f'Default group set to "{group_name}".')
+
+
+def list_backends() -> None:
+    """List all notification groups under ogroups/."""
+    groups_dir = get_groups_dir()
+    if not groups_dir.exists():
+        print('No groups directory found. Run `oven init-cfg` first.')
+        return
+
+    from omegaconf import OmegaConf
+
+    # Load default group name
+    meta_path = get_meta_cfg_path()
+    default_name = None
+    if meta_path.exists():
+        meta = OmegaConf.load(meta_path)
+        default_name = meta.get('default', None)
+
+    group_files = sorted(groups_dir.glob('*.yaml'))
+    if not group_files:
+        print('No groups found in ogroups/.')
+        return
+
+    for gf in group_files:
+        name = gf.stem
+        marker = ' (default)' if name == default_name else ''
+        try:
+            cfg = OmegaConf.load(gf)
+            backends_list = OmegaConf.to_container(
+                cfg.get('backends', []), resolve=True
+            )
+            if backends_list:
+                types = [b.get('type', '?') for b in backends_list if b]
+                types_str = ', '.join(types)
+            else:
+                types_str = '(empty)'
+        except Exception:
+            types_str = '(invalid)'
+        print(f'  {name}{marker}: {types_str}')
 
 
 def check_version() -> None:
@@ -62,22 +123,6 @@ def check_version() -> None:
         )
     else:
         print(f'🎉 Local oven version ({oven_version}) is up-to-date!')
-
-    # Configuration template version.
-    cfg_version = (
-        OmegaConf.load(get_cfg_path()).get('version', 'Missing!').strip()
-    )
-    try:
-        latest_cfg_version = get_latest_cfg_version().strip()
-    except Exception as e:
-        print('🥲 Fail to fetch latest cfg version.')
-        raise e
-    if cfg_version != latest_cfg_version:
-        print(
-            f'🤔 Local oven version {cfg_version} is not up-to-date ({latest_cfg_version}), please update.'
-        )
-    else:
-        print(f'🎉 Local config version ({cfg_version}) is up-to-date!')
 
 
 def print_manual() -> None:
