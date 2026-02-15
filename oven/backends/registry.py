@@ -38,9 +38,7 @@ _REGISTRY: Dict[str, Tuple[str, str, str, str]] = {
 
 def get_backend_classes(
     backend_type: str,
-) -> Tuple[
-    Type[NotifierBackendBase], Type[ExpInfoBase], Type[LogInfoBase]
-]:
+) -> Tuple[Type[NotifierBackendBase], Type[ExpInfoBase], Type[LogInfoBase]]:
     """Return (BackendClass, ExpInfoClass, LogInfoClass) for the given type.
 
     Raises ValueError if the backend type is unknown.
