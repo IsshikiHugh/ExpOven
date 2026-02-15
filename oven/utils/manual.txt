@@ -28,5 +28,5 @@ Full:
       reset-cfg                  Overwrite and reset the configuration files.
       set-default <group>        Set the default notification group.
                                  eg: oven set-default work
-      list-backends              List all notification groups and their backend types.
+      list-ogroups               List all notification groups and their backend types.
       home                       Display the detected home directory.

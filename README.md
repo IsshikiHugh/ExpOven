@@ -103,7 +103,7 @@ Edit `ogroups/default.yaml` to uncomment and fill in the backend(s) you want to 
 >
 > In Python: `oven.toggle_ogroup('work')`
 >
-> List all groups: `oven list-backends`
+> List all groups: `oven list-ogroups`
 </details><br/>
 
 <details> <summary>📌 Migrating from v0.6.x</summary>
@@ -156,13 +156,6 @@ X=1 bake 'X=2 echo $X'  # outputs 2
 
 ### As Package
 
-You can switch the notification group for the session:
-
-```py
-import oven
-oven.toggle_ogroup('work')  # All subsequent calls use the 'work' group.
-```
-
 As a single function, it notifies the message. The two forms are equivalent.
 
 ```py
@@ -205,6 +198,15 @@ def train() -> None:
         train_epoch()
         train_after_epoch()
 ```
+
+You can switch the notification group for the current session:
+
+```py
+import oven
+oven.toggle_ogroup('work')  # All subsequent calls use the 'work' group.
+```
+
+By default, it uses default group in the configuration file.
 
 ### Progress Tracking
 

@@ -86,7 +86,7 @@ def oven() -> None:
             print(f'Unexpected argument {args[1:]}!')
         else:
             set_default(args[0])
-    elif action == 'list-backends':
+    elif action == 'list-ogroups':
         from oven.utils import list_backends
 
         list_backends()
