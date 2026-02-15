@@ -164,7 +164,7 @@ def build_oven(
     except Exception as e:
         from oven.utils import get_home_path
 
-        print(f'Failed to build oven: {e}')
+        print(f'😢 Failed to build oven: {e}')
         print(
             f'Config home: {get_home_path()}\n'
             'Run `oven init-cfg` to create the config, then edit '

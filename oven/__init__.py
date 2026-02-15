@@ -27,7 +27,7 @@ def toggle_ogroup(group_name: str, force: bool = False) -> None:
     global _session_group, _session_group_locked, _lazy_oven_obj
     if _session_group_locked and not force:
         print(
-            f'Warning: ogroup already set to "{_session_group}" '
+            f'⚠️ Warning: ogroup already set to "{_session_group}" '
             f'for this session. Use toggle_ogroup("{group_name}", '
             f'force=True) to override.'
         )

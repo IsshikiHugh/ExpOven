@@ -39,10 +39,10 @@ def dump_cfg_temp(overwrite: bool = False) -> None:
     default_group_path = groups_dir / 'default.yaml'
 
     if not overwrite and meta_path.exists() and default_group_path.exists():
-        print(f'Config already exists at: {home}')
+        print(f'📂 Config already exists at: {home}')
         return
 
-    print(f'Dumping config to: {home}')
+    print(f'📝 Dumping config to: {home}')
     groups_dir.mkdir(parents=True, exist_ok=True)
 
     meta_path.write_text(_read_bundled_template('config.yaml.temp'))
@@ -58,20 +58,21 @@ def set_default(group_name: str) -> None:
     group_path = groups_dir / f'{group_name}.yaml'
     if not group_path.exists():
         print(
-            f'Group "{group_name}" not found. ' f'Expected file: {group_path}'
+            f'😵‍💫 Group "{group_name}" not found. '
+            f'Expected file: {group_path}'
         )
         return
 
     meta_path = get_meta_cfg_path()
     meta_path.write_text(f'default: {group_name}\n')
-    print(f'Default group set to "{group_name}".')
+    print(f'✅ Default group set to "{group_name}".')
 
 
 def list_backends() -> None:
     """List all notification groups under ogroups/."""
     groups_dir = get_groups_dir()
     if not groups_dir.exists():
-        print('No groups directory found. Run `oven init-cfg` first.')
+        print('😵‍💫 No groups directory found. Run `oven init-cfg` first.')
         return
 
     from omegaconf import OmegaConf
@@ -85,7 +86,7 @@ def list_backends() -> None:
 
     group_files = sorted(groups_dir.glob('*.yaml'))
     if not group_files:
-        print('No groups found in ogroups/.')
+        print('😶 No groups found in ogroups/.')
         return
 
     for gf in group_files:

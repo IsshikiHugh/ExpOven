@@ -81,9 +81,9 @@ def oven() -> None:
         from oven.utils import set_default
 
         if len(args) == 0:
-            print('Please specify a group name: oven set-default <group>')
+            print('😵‍💫 Please specify a group name: oven set-default <group>')
         elif len(args) > 1:
-            print(f'Unexpected argument {args[1:]}!')
+            print(f'😵‍💫 Unexpected argument {args[1:]}!')
         else:
             set_default(args[0])
     elif action == 'list-ogroups':
