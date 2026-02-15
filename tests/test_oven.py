@@ -45,7 +45,8 @@ class TestDingFunc(unittest.TestCase):
         signals = [c[0] for c in oven.backend.calls]
         self.assertEqual(signals, [Signal.S, Signal.T])
 
-    def test_exception_produces_two_notifications(self):
+    @patch('oven.oven.traceback.print_exc')
+    def test_exception_produces_two_notifications(self, _mock_tb):
         """ding_func() on exception: Signal.S then Signal.E, returns None."""
         oven = _make_oven_with_mock()
 
@@ -83,8 +84,9 @@ class TestDingCmd(unittest.TestCase):
             'echo hello', shell=True, check=True, encoding='utf-8'
         )
 
+    @patch('oven.oven.traceback.print_exc')
     @patch('oven.oven.subprocess.run')
-    def test_failure_produces_error_signal(self, mock_run):
+    def test_failure_produces_error_signal(self, mock_run, _mock_tb):
         """ding_cmd() on CalledProcessError: Signal.S then Signal.E."""
         mock_run.side_effect = subprocess.CalledProcessError(1, 'bad_cmd')
         oven = _make_oven_with_mock()
