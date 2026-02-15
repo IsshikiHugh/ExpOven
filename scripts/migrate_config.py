@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Migrate ExpOven config from old single-file format (cfg.yaml) to new group format.
+Mainly for configuration files before ExpOven version <= v0.6.4.
 
 Old layout:
   ~/.config/oven/cfg.yaml        # single file, all backends in one
