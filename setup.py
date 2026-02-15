@@ -11,7 +11,7 @@ setup(
     author_email='',
     packages=find_packages(),
     package_dir={'oven': 'oven'},
-    package_data={'oven': ['utils/manual.txt']},
+    package_data={'oven': ['utils/manual.txt', 'templates/*.yaml.temp']},
     include_package_data=True,
     description='Experiments monitor and notification utilities.',
     classifiers=[

@@ -1,1 +1,2 @@
 include oven/utils/manual.txt
+recursive-include oven/templates *.yaml.temp
