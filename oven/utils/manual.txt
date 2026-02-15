@@ -4,11 +4,15 @@ GitHub Repo: https://github.com/IsshikiHugh/ExpOven
 
 🔍 == Usage == 🔍
 Shortcuts:
-  ding <message>    Directly notify with a message.
+  ding [--ogroup <group>] <message>
+                    Directly notify with a message.
                     eg: ding "Hello World!"
-  bake <command>    Use notifier to monitor the status of the command. When the command is
+                    eg: ding --ogroup work "Hello World!"
+  bake [--ogroup <group>] <command>
+                    Use notifier to monitor the status of the command. When the command is
                     started or terminated, the notifier will send a message.
                     eg: bake python train.py --exp_name='debug'
+                    eg: bake --ogroup work python train.py
 
 Full:
   oven [actions] <actions-args>
@@ -19,8 +23,10 @@ Full:
                                  eg: oven ding "Hello World!"
       bake <command>             The same as the shortcut "bake".
                                  eg: oven bake python train.py --exp_name='debug'
-      init-cfg                   Create and initialize the configuration file if the file
-                                 does not exist.
-      reset-cfg                  Overwrite and reset the configuration file.
-      toggle-backend <backend>   Toggle the backend of the notifier.
+      init-cfg                   Create and initialize the configuration files if they
+                                 do not exist.
+      reset-cfg                  Overwrite and reset the configuration files.
+      set-default <group>        Set the default notification group.
+                                 eg: oven set-default work
+      list-backends              List all notification groups and their backend types.
       home                       Display the detected home directory.
