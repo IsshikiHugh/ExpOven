@@ -84,7 +84,6 @@ class ProgressBar:
         self.notify_mode = notify_mode
         self.notify_threshold = notify_threshold
         self.enable_notifications = enable_notifications
-
         # Progress tracking
         self.n = initial
         self.last_print_n = initial
@@ -112,14 +111,17 @@ class ProgressBar:
             # Import here to avoid circular imports
             from oven import get_lazy_oven
 
-            oven = get_lazy_oven()
-            if oven:
-                meta = oven.backend.get_meta()
+            oven_inst = get_lazy_oven()
+            if oven_inst and oven_inst.backends:
+                # Use the first backend in the group for progress tracking
+                backend = oven_inst.backends[0]
+                ExpInfoCls = oven_inst.exp_info_classes[0]
+                meta = backend.get_meta()
                 meta['cmd'] = (
                     f'Progress: {self.desc}' if self.desc else 'Progress'
                 )
-                self.exp_info = oven.ExpInfoClass(
-                    backend=oven.backend,
+                self.exp_info = ExpInfoCls(
+                    backend=backend,
                     exp_meta_info=meta,
                     description=self._format_progress_description(),
                 )

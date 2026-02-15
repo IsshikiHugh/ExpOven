@@ -1,0 +1,25 @@
+backends:
+  # Uncomment and fill in the backend(s) you want to use.
+  # You can enable multiple backends in one group to fan-out notifications.
+
+  # - type: dingtalk
+  #   hook: https://oapi.dingtalk.com/robot/send?access_token=<?>
+  #   secure_key: <?>
+  #   # host: <?>  # optional
+
+  # - type: feishu
+  #   hook: https://open.feishu.cn/open-apis/bot/v2/hook/<?>
+  #   signature: <?>
+  #   # host: <?>  # optional
+
+  # - type: slack
+  #   hook: https://hooks.slack.com/services/<?>/<?>/<?>
+  #   # host: <?>  # optional
+
+  # - type: email
+  #   smtp_server: <?>  # smtp.sample.com
+  #   smtp_port: <?>
+  #   sender_email: <?>  # sample@sample.com
+  #   sender_pwd: <?>
+  #   receiver_email: <?>  # sample@sample.com
+  #   # host: <?>  # optional

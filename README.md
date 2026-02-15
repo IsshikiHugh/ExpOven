@@ -63,19 +63,59 @@ Next, you need to edit the local configuration file.
 
 <details> <summary>📌 About Config File Location</summary>
 
-> The configuration file will be created at `$OVEN_HOME/cfg.yaml`, the default value of `OVEN_HOME` is `~/.config/oven`.
+> The configuration files live under `$OVEN_HOME` (default `~/.config/oven`).
+>
+> ```
+> ~/.config/oven/
+>   config.yaml            # meta config – sets the default group
+>   ogroups/
+>     default.yaml         # notification group (one or more backends)
+> ```
 >
 > You can check the current `OVEN_HOME` through CLI `oven home`.
 >
 > To customize `OVEN_HOME`, you only need to set the environment variable `OVEN_HOME` to the desired path.
 </details><br/>
 
-
 ```shell
-oven init-cfg  # Configuration template will be created at $OVEN_HOME/cfg.yaml.
+oven init-cfg  # Creates config.yaml + ogroups/default.yaml under $OVEN_HOME.
 ```
 
-The template of the config file will be synced from [docs/cfg.yaml.temp](./docs/cfg.yaml.temp).
+Edit `ogroups/default.yaml` to uncomment and fill in the backend(s) you want to use. A single group can contain multiple backends — all of them will be notified simultaneously.
+
+<details> <summary>📌 Notification Groups (ogroups)</summary>
+
+> Each YAML file under `ogroups/` defines a **notification group**. A group lists one or more backends that are all notified together.
+>
+> **Example** — `ogroups/work.yaml` with two backends:
+> ```yaml
+> backends:
+>   - type: dingtalk
+>     hook: https://oapi.dingtalk.com/robot/send?access_token=<?>
+>     secure_key: <?>
+>   - type: slack
+>     hook: https://hooks.slack.com/services/<?>/<?>/<?>
+> ```
+>
+> Set the default group: `oven set-default work`
+>
+> Or select per-command: `bake --ogroup work python train.py`
+>
+> In Python: `oven.toggle_ogroup('work')`
+>
+> List all groups: `oven list-ogroups`
+</details><br/>
+
+<details> <summary>📌 Migrating from v0.6.x</summary>
+
+> If you are upgrading from ExpOven <= v0.6.4 (old single-file `cfg.yaml`), run the migration script:
+>
+> ```shell
+> python scripts/migrate_config.py
+> ```
+>
+> This converts your old config into the new layout, creating a group for each configured backend. The previously active backend becomes `ogroups/default.yaml`. The old file is backed up as `cfg.yaml.bak`.
+</details><br/>
 
 
 ## Quick Start
@@ -85,9 +125,10 @@ Check [docs/examples.py](./docs/examples.py) for runnable examples.
 ### As CLI
 
 ```shell
-ding [LOGGING MESSAGE]
+ding [--ogroup <group>] [LOGGING MESSAGE]
 # eg:
 ding 'Hello World!'
+ding --ogroup work 'Hello World!'  # Use a specific group.
 mv from to ; ding 'Data moved.'  # Similar to `bake mv from to`.
 ```
 
@@ -96,9 +137,10 @@ Tips: When you have already started the experiment, you can still print type `di
 <center><img src="docs/eg_ding_dingtalk.png" width="50%"></center>
 
 ```shell
-bake [RUNNABLE COMMAND]
+bake [--ogroup <group>] [RUNNABLE COMMAND]
 # eg:
 bake echo 'Hello World!'
+bake --ogroup work python train.py  # Use a specific group.
 bake pip install -r requirements.txt
 bake bash scripts/download_data.sh
 bake CUDA_VISIBLE_DEVICES='0,1' python train.py
@@ -156,6 +198,15 @@ def train() -> None:
         train_epoch()
         train_after_epoch()
 ```
+
+You can switch the notification group for the current session:
+
+```py
+import oven
+oven.toggle_ogroup('work')  # All subsequent calls use the 'work' group.
+```
+
+By default, it uses default group in the configuration file.
 
 ### Progress Tracking
 
