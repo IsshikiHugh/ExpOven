@@ -10,15 +10,16 @@ from tests.mock_backend import MockBackend, make_dingtalk_meta
 
 
 def _make_oven_with_mock():
-    """Create an Oven instance bypassing _init_notifier, using MockBackend."""
+    """Create an Oven instance bypassing __init__, using MockBackend."""
     from oven.oven import Oven
 
-    # Bypass __init__ which calls _init_notifier and needs a real config.
+    # Bypass __init__ which needs real config.
     oven = object.__new__(Oven)
-    oven.backend = MockBackend(make_dingtalk_meta())
-    oven.ExpInfoClass = DingTalkExpInfo
-    oven.LogInfoClass = DingTalkLogInfo
-    oven.cfg = {}
+    oven.group_name = 'test'
+    mock_backend = MockBackend(make_dingtalk_meta())
+    oven.backends = [mock_backend]
+    oven.exp_info_classes = [DingTalkExpInfo]
+    oven.log_info_classes = [DingTalkLogInfo]
     return oven
 
 
@@ -27,8 +28,8 @@ class TestDingLog(unittest.TestCase):
         """ding_log() should produce exactly 1 notification (Signal.T via LogInfo)."""
         oven = _make_oven_with_mock()
         oven.ding_log('test message')
-        self.assertEqual(len(oven.backend.calls), 1)
-        self.assertEqual(oven.backend.calls[0][0], Signal.T)
+        self.assertEqual(len(oven.backends[0].calls), 1)
+        self.assertEqual(oven.backends[0].calls[0][0], Signal.T)
 
 
 class TestDingFunc(unittest.TestCase):
@@ -42,7 +43,7 @@ class TestDingFunc(unittest.TestCase):
 
         result = my_func()
         self.assertEqual(result, 42)
-        signals = [c[0] for c in oven.backend.calls]
+        signals = [c[0] for c in oven.backends[0].calls]
         self.assertEqual(signals, [Signal.S, Signal.T])
 
     @patch('oven.oven.traceback.print_exc')
@@ -56,7 +57,7 @@ class TestDingFunc(unittest.TestCase):
 
         result = failing_func()
         self.assertIsNone(result)
-        signals = [c[0] for c in oven.backend.calls]
+        signals = [c[0] for c in oven.backends[0].calls]
         self.assertEqual(signals, [Signal.S, Signal.E])
 
     def test_func_with_args(self):
@@ -78,7 +79,7 @@ class TestDingCmd(unittest.TestCase):
         mock_run.return_value = MagicMock(returncode=0)
         oven = _make_oven_with_mock()
         oven.ding_cmd('echo hello')
-        signals = [c[0] for c in oven.backend.calls]
+        signals = [c[0] for c in oven.backends[0].calls]
         self.assertEqual(signals, [Signal.S, Signal.T])
         mock_run.assert_called_once_with(
             'echo hello', shell=True, check=True, encoding='utf-8'
@@ -91,8 +92,56 @@ class TestDingCmd(unittest.TestCase):
         mock_run.side_effect = subprocess.CalledProcessError(1, 'bad_cmd')
         oven = _make_oven_with_mock()
         oven.ding_cmd('bad_cmd')
-        signals = [c[0] for c in oven.backend.calls]
+        signals = [c[0] for c in oven.backends[0].calls]
         self.assertEqual(signals, [Signal.S, Signal.E])
+
+
+class TestMultiBackendFanOut(unittest.TestCase):
+    """Test that all backends in a group receive notifications."""
+
+    def _make_multi_backend_oven(self):
+        from oven.oven import Oven
+
+        oven = object.__new__(Oven)
+        oven.group_name = 'test_multi'
+        mock1 = MockBackend(make_dingtalk_meta())
+        mock2 = MockBackend(make_dingtalk_meta())
+        oven.backends = [mock1, mock2]
+        oven.exp_info_classes = [DingTalkExpInfo, DingTalkExpInfo]
+        oven.log_info_classes = [DingTalkLogInfo, DingTalkLogInfo]
+        return oven
+
+    def test_ding_log_fans_out(self):
+        """ding_log() should notify all backends."""
+        oven = self._make_multi_backend_oven()
+        oven.ding_log('fan out test')
+        for backend in oven.backends:
+            self.assertEqual(len(backend.calls), 1)
+            self.assertEqual(backend.calls[0][0], Signal.T)
+
+    def test_ding_func_fans_out(self):
+        """ding_func() should notify all backends."""
+        oven = self._make_multi_backend_oven()
+
+        @oven.ding_func
+        def my_func():
+            return 99
+
+        result = my_func()
+        self.assertEqual(result, 99)
+        for backend in oven.backends:
+            signals = [c[0] for c in backend.calls]
+            self.assertEqual(signals, [Signal.S, Signal.T])
+
+    @patch('oven.oven.subprocess.run')
+    def test_ding_cmd_fans_out(self, mock_run):
+        """ding_cmd() should notify all backends."""
+        mock_run.return_value = MagicMock(returncode=0)
+        oven = self._make_multi_backend_oven()
+        oven.ding_cmd('echo hi')
+        for backend in oven.backends:
+            signals = [c[0] for c in backend.calls]
+            self.assertEqual(signals, [Signal.S, Signal.T])
 
 
 if __name__ == '__main__':
