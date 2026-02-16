@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Union, Dict
 
 from .info import *
@@ -9,7 +10,7 @@ class RespStatus:
         self.err_msg: str = err_msg
 
 
-class NotifierBackendBase:
+class NotifierBackendBase(ABC):
 
     # ========================================== #
     # Functions below should/can be overwritten. #
@@ -18,9 +19,11 @@ class NotifierBackendBase:
     def __init__(self, cfg: Dict) -> None:
         """Read necessary information from config file. And validate the configuration."""
 
+    @abstractmethod
     def notify(self, info: ExpInfoBase) -> RespStatus:
-        raise NotImplementedError
+        ...
 
+    @abstractmethod
     def get_meta(self) -> Dict:
         """Generate meta information for information object."""
-        raise NotImplementedError
+        ...
