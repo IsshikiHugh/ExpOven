@@ -1,3 +1,4 @@
+from html import escape
 from typing import Dict
 
 from oven.backends.api import Signal, ExpInfoBase, LogInfoBase
@@ -8,10 +9,12 @@ from oven.utils.time import (
 
 
 def lines2reply(lines):
-    """It changes lines to string block and add quotation mark at the beginning of each line."""
-    if lines == ['']:
+    """Convert lines to an HTML blockquote with proper escaping."""
+    if not lines or lines == ['']:
         return ''
-    return '> ' + '\n>\n> '.join(lines).strip()
+    escaped = [escape(line) for line in lines]
+    content = '<br>'.join(escaped)
+    return f'<blockquote>{content}</blockquote>'
 
 
 class EmailExpInfo(ExpInfoBase):
@@ -23,14 +26,15 @@ class EmailExpInfo(ExpInfoBase):
     def format_information(self) -> dict:
         # Never send empty paragraph, it would be ugly.
 
-        element = self.exp_info
+        parts = [self.exp_info]
         if len(self.aux_info) > 0:
-            element += '\n' + self.aux_info + '\n'
+            parts.append(self.aux_info)
         if len(self.current_description) > 0:
-            element += self.current_description
+            parts.append(self.current_description)
+        content = '<br>'.join(parts)
         information = {
             'subject': f'{self.readable_time} @ {self.host}',
-            'content': element,
+            'content': content,
         }
         return information
 
@@ -52,30 +56,42 @@ class EmailExpInfo(ExpInfoBase):
         self.readable_time = timestamp_to_readable(self.current_timestamp)
 
         # Format the information for later use.
-        self.current_description = self.current_description
+        self.current_description = self.current_description.replace(
+            '\n', '<br>'
+        )
         if self.current_signal == Signal.S:
+            escaped_cmd = escape(self.cmd)
             if self.current_description == '':
-                self.exp_info = f'🔥 `{self.cmd}`'
+                self.exp_info = f'🔥 <code>{escaped_cmd}</code>'
             else:
-                self.exp_info = f'🔥 `{self.cmd}`\n' + lines2reply(
-                    self.current_description.split('\n')
+                self.exp_info = (
+                    f'🔥 <code>{escaped_cmd}</code><br>'
+                    + lines2reply(self.current_description.split('<br>'))
                 )
             self.exp_info_backup = self.exp_info
             self.aux_info = ''
         else:
-            self.exp_info = lines2reply(self.exp_info_backup.split('\n'))
+            # exp_info_backup is already escaped HTML, wrap directly.
+            self.exp_info = (
+                f'<blockquote>{self.exp_info_backup}</blockquote>'
+                if self.exp_info_backup
+                else ''
+            )
 
-            cost_info = f'⏱️ **Time Cost**: {seconds_to_adaptive_time_cost(self.current_timestamp - self.start_timestamp)}.'
+            time_cost = seconds_to_adaptive_time_cost(
+                self.current_timestamp - self.start_timestamp
+            )
+            cost_info = f'⏱️ <b>Time Cost</b>: {time_cost}.'
             if self.current_signal == Signal.P:
-                status_info = '🏃 **Running!**'
+                status_info = '🏃 <b>Running!</b>'
             elif self.current_signal == Signal.E:
-                status_info = '❌ **Error!**'
+                status_info = '❌ <b>Error!</b>'
             elif self.current_signal == Signal.T:
                 status_info = '🔔 Done!'
             else:
                 assert False, f'Unknown signal: {self.current_signal}'
 
-            self.aux_info = '\n'.join([cost_info, status_info])
+            self.aux_info = '<br>'.join([cost_info, status_info])
 
     # ================ #
     # Utils functions. #

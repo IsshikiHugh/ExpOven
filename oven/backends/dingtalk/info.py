@@ -1,20 +1,11 @@
 from typing import Dict
 
 from oven.backends.api import Signal, ExpInfoBase, LogInfoBase
+from oven.backends.api.info import lines2reply, plain2md
 from oven.utils.time import (
     timestamp_to_readable,
     seconds_to_adaptive_time_cost,
 )
-
-
-def lines2reply(lines):
-    """It changes lines to string block and add quotation mark at the beginning of each line."""
-    return '> ' + '\n>\n> '.join(lines).strip()
-
-
-def plain2md(text):
-    text = text.strip().replace('\n', '\n\n')
-    return text
 
 
 LINE_SPLIT = '\n\n'

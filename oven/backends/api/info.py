@@ -1,5 +1,6 @@
 import random
 import socket
+from enum import IntEnum
 from typing import Optional, Dict
 from oven.utils.time import get_current_timestamp
 
@@ -13,7 +14,20 @@ EMOJI_TASK_ICON_POOL = [
 # fmt: on
 
 
-class Signal:
+def lines2reply(lines, separator='\n>\n> '):
+    """Convert lines to a quoted block with '> ' prefix on each line."""
+    if not lines or lines == ['']:
+        return ''
+    return '> ' + separator.join(lines).strip()
+
+
+def plain2md(text):
+    """Convert plain text to markdown by double-spacing newlines."""
+    text = text.strip().replace('\n', '\n\n')
+    return text
+
+
+class Signal(IntEnum):
     U = -1  # unknown
     I = 0  # initialization
     S = 1  # start
@@ -23,18 +37,15 @@ class Signal:
 
     @staticmethod
     def is_valid(signal):
-        return signal in [
-            Signal.U,
-            Signal.I,
-            Signal.S,
-            Signal.P,
-            Signal.T,
-            Signal.E,
-        ]
+        try:
+            Signal(signal)
+            return True
+        except ValueError:
+            return False
 
     @staticmethod
     def is_noisy(signal):
-        return signal in [Signal.S, Signal.P, Signal.T, Signal.E]
+        return signal in (Signal.S, Signal.P, Signal.T, Signal.E)
 
 
 class ExpInfoBase:
@@ -65,13 +76,15 @@ class ExpInfoBase:
     def __init__(
         self,
         backend,
-        exp_meta_info: Dict = {},
+        exp_meta_info: Optional[Dict] = None,
         description: Optional[str] = '',
     ) -> None:
         """Initialize the experiment logging information when it starts."""
         self.backend = backend  # store the reference of backend
 
         # Initialization.
+        if exp_meta_info is None:
+            exp_meta_info = {}
         exp_meta_info['default_host'] = socket.gethostname()
         self.exp_meta_info = exp_meta_info
         self.current_signal = Signal.I

@@ -19,13 +19,13 @@ class EmailBackend(NotifierBackendBase):
             cfg['smtp_port'], int
         ), 'Please ensure the validity of "email.smtp_port" field in the configuration file!'
         assert (
-            'sender_email' in cfg and '<?>' not in cfg['smtp_server']
+            'sender_email' in cfg and '<?>' not in cfg['sender_email']
         ), 'Please ensure the validity of "email.sender_email" field in the configuration file!'
         assert (
-            'sender_pwd' in cfg and '<?>' not in cfg['smtp_server']
+            'sender_pwd' in cfg and '<?>' not in cfg['sender_pwd']
         ), 'Please ensure the validity of "email.sender_pwd" field in the configuration file!'
         assert (
-            'receiver_email' in cfg and '<?>' not in cfg['smtp_server']
+            'receiver_email' in cfg and '<?>' not in cfg['receiver_email']
         ), 'Please ensure the validity of "email.receiver_email" field in the configuration file!'
 
         # Setup.
@@ -39,11 +39,8 @@ class EmailBackend(NotifierBackendBase):
     def get_meta(self) -> Dict:
         """Generate meta information for information object."""
         return {
-            'smtp_server': self.cfg.get('smtp_server', None),
-            'smtp_port': self.cfg.get('smtp_port', None),
-            'sender_email': self.cfg.get('sender_email', None),
-            'sender_pwd': self.cfg.get('sender_pwd', None),
-            'receiver_email': self.cfg.get('receiver_email', None),
+            'host': self.cfg.get('host', None),
+            'backend': 'EmailBackend',
         }
 
     def notify(self, info: EmailExpInfo):
@@ -74,7 +71,7 @@ class EmailBackend(NotifierBackendBase):
         msg['Subject'] = subject
 
         # Attach content
-        msg.attach(MIMEText(content, 'plain'))
+        msg.attach(MIMEText(content, 'html'))
         has_err, err_msg = False, ''
         try:
             # Connect to the SMTP server.
