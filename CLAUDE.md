@@ -43,12 +43,15 @@ User Code (CLI / Python API)
                 → Third-party APIs
 ```
 
-- **`oven/oven.py`** — `Oven` class: central coordinator. `build_oven()` factory loads YAML config and creates an instance. `_init_notifier()` dynamically imports the selected backend.
-- **`oven/backends/api/info.py`** — Defines the Signal system (`I/S/P/T/E`) and base classes `ExpInfoBase` (long-running experiments with multiple signals) and `LogInfoBase` (single messages).
-- **`oven/backends/<name>/`** — Each backend provides three classes: `*Backend(NotifierBackendBase)`, `*ExpInfo(ExpInfoBase)`, `*LogInfo(LogInfoBase)`. Add new backends by following this pattern.
-- **`oven/__init__.py`** — Public API with lazy global oven instance. Exports `bake`/`monitor`, `ding`/`notify`, `progress`, `ProgressBar`.
+- **`oven/oven.py`** — `Oven` class: central coordinator. `build_oven()` factory loads group YAML config and creates an instance. Supports notification groups via `_load_group_config()`.
+- **`oven/backends/registry.py`** — Backend registry: maps type strings to `(BackendClass, ExpInfoClass, LogInfoClass)` tuples with lazy imports. Register new backends here.
+- **`oven/backends/api/__init__.py`** — `NotifierBackendBase(ABC)` with `@abstractmethod` for `notify()` and `get_meta()`. Also exports `RespStatus`.
+- **`oven/backends/api/info.py`** — `Signal(IntEnum)` for signal values (`U/I/S/P/T/E`), base classes `ExpInfoBase` and `LogInfoBase`, and shared utilities `lines2reply()` / `plain2md()` used by DingTalk and Feishu backends.
+- **`oven/backends/<name>/`** — Each backend provides three classes: `*Backend(NotifierBackendBase)`, `*ExpInfo(ExpInfoBase)`, `*LogInfo(LogInfoBase)`. Email backend uses HTML formatting; others use markdown. Slack keeps its own `lines2reply()` for platform-specific quoting.
+- **`oven/__init__.py`** — Public API with lazy global oven instance. Exports `bake`/`monitor`, `ding`/`notify`, `toggle_ogroup`, `progress`, `progress_range`, `ProgressBar`, `get_lazy_oven`, `Oven`, `build_oven`.
 - **`oven/cli.py`** — CLI handlers for the three entry points defined in `setup.py`.
 - **`oven/progress.py`** — tqdm-like `ProgressBar` with optional notification integration (HTTP polling or socket-triggered modes).
+- **`setup.py`** — Uses regex to parse version from `oven/version.py` (not `exec()`).
 
 ### Signal Lifecycle
 
@@ -56,7 +59,17 @@ User Code (CLI / Python API)
 
 ### Configuration
 
-YAML config at `$OVEN_HOME/cfg.yaml` (default `~/.config/oven/cfg.yaml`), managed via OmegaConf. The `backend` field selects the active backend; remaining keys hold backend-specific settings.
+Config lives under `$OVEN_HOME` (default `~/.config/oven/`), managed via OmegaConf:
+
+```
+~/.config/oven/
+├── config.yaml          # meta config: `default: <group_name>`
+└── ogroups/
+    ├── default.yaml     # default notification group
+    └── <name>.yaml      # additional groups
+```
+
+Each group YAML contains a `backends` list — one entry per backend (type + credentials). Multiple backends in one group enable fan-out notifications. CLI commands: `oven init-cfg`, `oven set-default <group>`, `oven list-ogroups`. Python API: `oven.toggle_ogroup('group_name')` switches group at runtime.
 
 ## Key Conventions
 
@@ -68,5 +81,3 @@ YAML config at `$OVEN_HOME/cfg.yaml` (default `~/.config/oven/cfg.yaml`), manage
 - **Always run unit tests (`python -m unittest discover tests/ -p 'test_*.py'`) before committing** to verify changes don't break existing functionality. Run automatically without asking.
 - **Use the conda `cv` environment** for running tests and formatting: `eval "$(/opt/miniconda3/condabin/conda shell.bash hook)" && conda activate cv`
 - **Bump the version in `oven/version.py` when making changes.** Follow semver: patch for bug fixes and non-functional changes (tests, refactors), minor for new features or enhancements, major for breaking changes. Bump wisely — if a change is logically part of an already-bumped change (e.g., adding CI for tests that were already versioned), don't bump again
-- **NEVER push to remote without explicit user permission.** Always ask first. No exceptions.
-- **Never write sensitive information** (API keys, tokens, passwords, webhook URLs, personal paths, etc.) into any tracked file, including this one. Use placeholders (e.g., `<?>`) in examples. Config files containing secrets (`cfg.yaml`) are already gitignored
