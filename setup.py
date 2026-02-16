@@ -1,8 +1,10 @@
+import re
 from setuptools import setup, find_packages
 
 
 with open('oven/version.py') as f:
-    exec(f.read())
+    match = re.search(r"__version__\s*=\s*['\"](.+)['\"]", f.read())
+    __version__ = match.group(1)
 
 setup(
     name='exp_oven',
