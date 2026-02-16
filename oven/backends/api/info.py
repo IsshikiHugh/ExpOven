@@ -1,5 +1,6 @@
 import random
 import socket
+from enum import IntEnum
 from typing import Optional, Dict
 from oven.utils.time import get_current_timestamp
 
@@ -26,7 +27,7 @@ def plain2md(text):
     return text
 
 
-class Signal:
+class Signal(IntEnum):
     U = -1  # unknown
     I = 0  # initialization
     S = 1  # start
@@ -36,18 +37,15 @@ class Signal:
 
     @staticmethod
     def is_valid(signal):
-        return signal in [
-            Signal.U,
-            Signal.I,
-            Signal.S,
-            Signal.P,
-            Signal.T,
-            Signal.E,
-        ]
+        try:
+            Signal(signal)
+            return True
+        except ValueError:
+            return False
 
     @staticmethod
     def is_noisy(signal):
-        return signal in [Signal.S, Signal.P, Signal.T, Signal.E]
+        return signal in (Signal.S, Signal.P, Signal.T, Signal.E)
 
 
 class ExpInfoBase:
