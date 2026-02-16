@@ -71,7 +71,12 @@ class EmailExpInfo(ExpInfoBase):
             self.exp_info_backup = self.exp_info
             self.aux_info = ''
         else:
-            self.exp_info = lines2reply(self.exp_info_backup.split('<br>'))
+            # exp_info_backup is already escaped HTML, wrap directly.
+            self.exp_info = (
+                f'<blockquote>{self.exp_info_backup}</blockquote>'
+                if self.exp_info_backup
+                else ''
+            )
 
             time_cost = seconds_to_adaptive_time_cost(
                 self.current_timestamp - self.start_timestamp
