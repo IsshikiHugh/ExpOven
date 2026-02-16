@@ -71,7 +71,7 @@ class EmailBackend(NotifierBackendBase):
         msg['Subject'] = subject
 
         # Attach content
-        msg.attach(MIMEText(content, 'plain'))
+        msg.attach(MIMEText(content, 'html'))
         has_err, err_msg = False, ''
         try:
             # Connect to the SMTP server.

@@ -9,10 +9,10 @@ from oven.utils.time import (
 
 
 def lines2reply(lines):
-    """Slack-specific quoting: single-spaced, no extra blank lines between quotes."""
-    from oven.backends.api.info import lines2reply as _lines2reply
-
-    return _lines2reply(lines, separator='\n> ')
+    """Slack-specific quoting: no space after initial '>', single-spaced."""
+    if not lines or lines == ['']:
+        return ''
+    return '>' + '\n> '.join(lines).strip()
 
 
 LINE_SPLIT = '\n'

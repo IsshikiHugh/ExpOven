@@ -1,11 +1,18 @@
 from typing import Dict
 
 from oven.backends.api import Signal, ExpInfoBase, LogInfoBase
-from oven.backends.api.info import lines2reply
 from oven.utils.time import (
     timestamp_to_readable,
     seconds_to_adaptive_time_cost,
 )
+
+
+def lines2reply(lines):
+    """Convert lines to an HTML blockquote."""
+    if not lines or lines == ['']:
+        return ''
+    content = '<br>'.join(lines)
+    return f'<blockquote>{content}</blockquote>'
 
 
 class EmailExpInfo(ExpInfoBase):
@@ -17,14 +24,15 @@ class EmailExpInfo(ExpInfoBase):
     def format_information(self) -> dict:
         # Never send empty paragraph, it would be ugly.
 
-        element = self.exp_info
+        parts = [self.exp_info]
         if len(self.aux_info) > 0:
-            element += '\n' + self.aux_info + '\n'
+            parts.append(self.aux_info)
         if len(self.current_description) > 0:
-            element += self.current_description
+            parts.append(self.current_description)
+        content = '<br>'.join(parts)
         information = {
             'subject': f'{self.readable_time} @ {self.host}',
-            'content': element,
+            'content': content,
         }
         return information
 
@@ -49,27 +57,30 @@ class EmailExpInfo(ExpInfoBase):
         self.current_description = self.current_description
         if self.current_signal == Signal.S:
             if self.current_description == '':
-                self.exp_info = f'🔥 `{self.cmd}`'
+                self.exp_info = f'🔥 <code>{self.cmd}</code>'
             else:
-                self.exp_info = f'🔥 `{self.cmd}`\n' + lines2reply(
+                self.exp_info = f'🔥 <code>{self.cmd}</code><br>' + lines2reply(
                     self.current_description.split('\n')
                 )
             self.exp_info_backup = self.exp_info
             self.aux_info = ''
         else:
-            self.exp_info = lines2reply(self.exp_info_backup.split('\n'))
+            self.exp_info = lines2reply(self.exp_info_backup.split('<br>'))
 
-            cost_info = f'⏱️ **Time Cost**: {seconds_to_adaptive_time_cost(self.current_timestamp - self.start_timestamp)}.'
+            time_cost = seconds_to_adaptive_time_cost(
+                self.current_timestamp - self.start_timestamp
+            )
+            cost_info = f'⏱️ <b>Time Cost</b>: {time_cost}.'
             if self.current_signal == Signal.P:
-                status_info = '🏃 **Running!**'
+                status_info = '🏃 <b>Running!</b>'
             elif self.current_signal == Signal.E:
-                status_info = '❌ **Error!**'
+                status_info = '❌ <b>Error!</b>'
             elif self.current_signal == Signal.T:
                 status_info = '🔔 Done!'
             else:
                 assert False, f'Unknown signal: {self.current_signal}'
 
-            self.aux_info = '\n'.join([cost_info, status_info])
+            self.aux_info = '<br>'.join([cost_info, status_info])
 
     # ================ #
     # Utils functions. #
