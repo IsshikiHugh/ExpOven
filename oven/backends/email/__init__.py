@@ -19,13 +19,13 @@ class EmailBackend(NotifierBackendBase):
             cfg['smtp_port'], int
         ), 'Please ensure the validity of "email.smtp_port" field in the configuration file!'
         assert (
-            'sender_email' in cfg and '<?>' not in cfg['smtp_server']
+            'sender_email' in cfg and '<?>' not in cfg['sender_email']
         ), 'Please ensure the validity of "email.sender_email" field in the configuration file!'
         assert (
-            'sender_pwd' in cfg and '<?>' not in cfg['smtp_server']
+            'sender_pwd' in cfg and '<?>' not in cfg['sender_pwd']
         ), 'Please ensure the validity of "email.sender_pwd" field in the configuration file!'
         assert (
-            'receiver_email' in cfg and '<?>' not in cfg['smtp_server']
+            'receiver_email' in cfg and '<?>' not in cfg['receiver_email']
         ), 'Please ensure the validity of "email.receiver_email" field in the configuration file!'
 
         # Setup.
