@@ -1,3 +1,4 @@
+from html import escape
 from typing import Dict
 
 from oven.backends.api import Signal, ExpInfoBase, LogInfoBase
@@ -8,10 +9,11 @@ from oven.utils.time import (
 
 
 def lines2reply(lines):
-    """Convert lines to an HTML blockquote."""
+    """Convert lines to an HTML blockquote with proper escaping."""
     if not lines or lines == ['']:
         return ''
-    content = '<br>'.join(lines)
+    escaped = [escape(line) for line in lines]
+    content = '<br>'.join(escaped)
     return f'<blockquote>{content}</blockquote>'
 
 
@@ -54,13 +56,17 @@ class EmailExpInfo(ExpInfoBase):
         self.readable_time = timestamp_to_readable(self.current_timestamp)
 
         # Format the information for later use.
-        self.current_description = self.current_description
+        self.current_description = self.current_description.replace(
+            '\n', '<br>'
+        )
         if self.current_signal == Signal.S:
+            escaped_cmd = escape(self.cmd)
             if self.current_description == '':
-                self.exp_info = f'🔥 <code>{self.cmd}</code>'
+                self.exp_info = f'🔥 <code>{escaped_cmd}</code>'
             else:
-                self.exp_info = f'🔥 <code>{self.cmd}</code><br>' + lines2reply(
-                    self.current_description.split('\n')
+                self.exp_info = (
+                    f'🔥 <code>{escaped_cmd}</code><br>'
+                    + lines2reply(self.current_description.split('<br>'))
                 )
             self.exp_info_backup = self.exp_info
             self.aux_info = ''
