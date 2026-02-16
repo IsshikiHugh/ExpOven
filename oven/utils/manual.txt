@@ -4,15 +4,17 @@ GitHub Repo: https://github.com/IsshikiHugh/ExpOven
 
 🔍 == Usage == 🔍
 Shortcuts:
-  ding [--ogroup <group>] <message>
+  ding [--ogroup/-g <group>] <message>
                     Directly notify with a message.
                     eg: ding "Hello World!"
                     eg: ding --ogroup work "Hello World!"
-  bake [--ogroup <group>] <command>
+                    eg: ding -g work "Hello World!"
+  bake [--ogroup/-g <group>] <command>
                     Use notifier to monitor the status of the command. When the command is
                     started or terminated, the notifier will send a message.
                     eg: bake python train.py --exp_name='debug'
                     eg: bake --ogroup work python train.py
+                    eg: bake -g work python train.py
 
 Full:
   oven [actions] <actions-args>

@@ -6,7 +6,9 @@
 
 [🍞 Installation](#installation)
 |
-[🍕 Quick Start](#quick-start)
+[🔧 Configuration](#configuration)
+|
+[🍕 Usage](#usage)
 |
 [🧅 Contribution](./docs/CONTRIBUTING.md)
 </center>
@@ -15,9 +17,14 @@ ExpOven is a notifier application mainly designed for AI researchers. It provide
 
 You execute your experiments or commands on the server. When the command is completed or encounters an issue, you will receive a notification in your messaging apps (such as DingTalk, email, Slack, etc.). Additionally, you can use this tool to track the progress of the experiments.
 
-## Installation
+## Supported Backends
 
-### Step 1. Install Package
+- [DingTalk](./docs/third_party_setup/dingtalk.md)
+- [Feishu(Lark)](./docs/third_party_setup/feishu.md)
+- [Slack](./docs/third_party_setup/slack.md)
+- [Email](./docs/third_party_setup/email.md)
+
+## Installation
 
 Like most python packages, you can install ExpOven via following methods:
 
@@ -50,36 +57,30 @@ After installation, you can check if the installation is successful by typing th
 oven help
 ```
 
-### Step 2. Setup & Configuration
+## Configuration
 
-Now you need to configuration the third-party supports. You can only configure the most commonly used ones. Check the following links for more details:
+Now you need to configuration the third-party supports. You can only configure the most commonly used ones. Check the [Supported Backends](#supported-backends) section for setup guides.
 
-- [DingTalk](./docs/third_party_setup/dingtalk.md)
-- [Feishu(Lark)](./docs/third_party_setup/feishu.md)
-- [Slack](./docs/third_party_setup/slack.md)
-- [Email](./docs/third_party_setup/email.md)
-
-Next, you need to edit the local configuration file.
+```shell
+oven init-cfg  # Creates config.yaml + ogroups/default.yaml under $OVEN_HOME.
+```
 
 <details> <summary>📌 About Config File Location</summary>
 
 > The configuration files live under `$OVEN_HOME` (default `~/.config/oven`).
 >
 > ```
-> ~/.config/oven/
->   config.yaml            # meta config – sets the default group
->   ogroups/
->     default.yaml         # notification group (one or more backends)
+> ~/.config/oven
+>    ├── config.yaml                   # meta config to set the default group
+>    └── ogroups
+>        ├── default.yaml              # default notification group (one or more backends)
+>        └── <custom_group_name>.yaml  # customize other notification groups (one or more backends)
 > ```
 >
 > You can check the current `OVEN_HOME` through CLI `oven home`.
 >
 > To customize `OVEN_HOME`, you only need to set the environment variable `OVEN_HOME` to the desired path.
 </details><br/>
-
-```shell
-oven init-cfg  # Creates config.yaml + ogroups/default.yaml under $OVEN_HOME.
-```
 
 Edit `ogroups/default.yaml` to uncomment and fill in the backend(s) you want to use. A single group can contain multiple backends — all of them will be notified simultaneously.
 
@@ -99,7 +100,7 @@ Edit `ogroups/default.yaml` to uncomment and fill in the backend(s) you want to 
 >
 > Set the default group: `oven set-default work`
 >
-> Or select per-command: `bake --ogroup work python train.py`
+> Or select per-command: `bake --ogroup work python train.py` or `ding -g work 'Hello World!'`
 >
 > In Python: `oven.toggle_ogroup('work')`
 >
@@ -117,19 +118,18 @@ Edit `ogroups/default.yaml` to uncomment and fill in the backend(s) you want to 
 > This converts your old config into the new layout, creating a group for each configured backend. The previously active backend becomes `ogroups/default.yaml`. The old file is backed up as `cfg.yaml.bak`.
 </details><br/>
 
+## Usage
 
-## Quick Start
+Check [docs/examples/basic.py](./docs/examples/basic.py) for runnable examples.
 
-Check [docs/examples.py](./docs/examples.py) for runnable examples.
-
-### As CLI
+### CLI
 
 ```shell
 ding [--ogroup <group>] [LOGGING MESSAGE]
 # eg:
 ding 'Hello World!'
 ding --ogroup work 'Hello World!'  # Use a specific group.
-mv from to ; ding 'Data moved.'  # Similar to `bake mv from to`.
+mv from to ; ding 'Data moved.'    # Similar to `bake mv from to`.
 ```
 
 Tips: When you have already started the experiment, you can still print type `ding 'Exp xxx stopped.'` and press Enter. Although it seems you don't send the command correctly, it's actually put into the queue. When the experiment is over, the command will still be executed.
@@ -154,7 +154,7 @@ X=1 bake 'X=2 echo $X'  # outputs 2
 
 <center><img src="docs/eg_bake_dingtalk.png" width="50%"></center>
 
-### As Package
+### Python API
 
 As a single function, it notifies the message. The two forms are equivalent.
 
@@ -207,31 +207,6 @@ oven.toggle_ogroup('work')  # All subsequent calls use the 'work' group.
 ```
 
 By default, it uses default group in the configuration file.
-
-### Progress Tracking
-
-Track progress with tqdm-like interface that also sends notifications:
-
-```py
-import oven
-
-# Simple progress bar with notifications
-for i in oven.progress_range(100, desc="Training"):
-    train_step(i)
-
-# Wrap any iterable
-data = load_dataset()
-for batch in oven.progress(data, desc="Processing batches"):
-    process_batch(batch)
-
-# Manual progress updates
-with oven.ProgressBar(total=1000, desc="Custom task") as pbar:
-    for i in range(100):
-        do_work()
-        pbar.update(10)  # Update by 10 items
-```
-
-Check [docs/pbar_interface.md](./docs/pbar_interface.md) for more information about the API.
 
 ## Contributing
 
