@@ -53,7 +53,7 @@ class Oven:
                 kwargs_keys = list(kwargs.keys())
                 if n_kwargs <= 5:
                     kwargs_keys = ', '.join(kwargs_keys)
-                    args_info += f', kwargs={kwargs_keys} )'
+                    args_info += f', kwargs={kwargs_keys}'
                 else:
                     kwargs_keys = ', '.join(kwargs_keys[:5])
                     args_info += f', kwargs={kwargs_keys}...'
