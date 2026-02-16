@@ -65,13 +65,15 @@ class ExpInfoBase:
     def __init__(
         self,
         backend,
-        exp_meta_info: Dict = {},
+        exp_meta_info: Optional[Dict] = None,
         description: Optional[str] = '',
     ) -> None:
         """Initialize the experiment logging information when it starts."""
         self.backend = backend  # store the reference of backend
 
         # Initialization.
+        if exp_meta_info is None:
+            exp_meta_info = {}
         exp_meta_info['default_host'] = socket.gethostname()
         self.exp_meta_info = exp_meta_info
         self.current_signal = Signal.I
