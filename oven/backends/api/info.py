@@ -13,6 +13,19 @@ EMOJI_TASK_ICON_POOL = [
 # fmt: on
 
 
+def lines2reply(lines, separator='\n>\n> '):
+    """Convert lines to a quoted block with '> ' prefix on each line."""
+    if not lines or lines == ['']:
+        return ''
+    return '> ' + separator.join(lines).strip()
+
+
+def plain2md(text):
+    """Convert plain text to markdown by double-spacing newlines."""
+    text = text.strip().replace('\n', '\n\n')
+    return text
+
+
 class Signal:
     U = -1  # unknown
     I = 0  # initialization

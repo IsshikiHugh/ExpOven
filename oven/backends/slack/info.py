@@ -1,6 +1,7 @@
 from typing import Dict
 
 from oven.backends.api import Signal, ExpInfoBase, LogInfoBase
+from oven.backends.api.info import plain2md
 from oven.utils.time import (
     timestamp_to_readable,
     seconds_to_adaptive_time_cost,
@@ -8,17 +9,10 @@ from oven.utils.time import (
 
 
 def lines2reply(lines):
-    """It changes lines to string block and add quotation mark at the beginning of each line."""
-    if len(lines) == 0 or lines == ['']:
-        reply = ''
-    else:
-        reply = '>' + '\n> '.join(lines).strip()
-    return reply
+    """Slack-specific quoting: single-spaced, no extra blank lines between quotes."""
+    from oven.backends.api.info import lines2reply as _lines2reply
 
-
-def plain2md(text):
-    text = text.strip().replace('\n', '\n\n')
-    return text
+    return _lines2reply(lines, separator='\n> ')
 
 
 LINE_SPLIT = '\n'
