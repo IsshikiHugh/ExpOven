@@ -39,11 +39,8 @@ class EmailBackend(NotifierBackendBase):
     def get_meta(self) -> Dict:
         """Generate meta information for information object."""
         return {
-            'smtp_server': self.cfg.get('smtp_server', None),
-            'smtp_port': self.cfg.get('smtp_port', None),
-            'sender_email': self.cfg.get('sender_email', None),
-            'sender_pwd': self.cfg.get('sender_pwd', None),
-            'receiver_email': self.cfg.get('receiver_email', None),
+            'host': self.cfg.get('host', None),
+            'backend': 'EmailBackend',
         }
 
     def notify(self, info: EmailExpInfo):
