@@ -208,6 +208,33 @@ oven.toggle_ogroup('work')  # All subsequent calls use the 'work' group.
 
 By default, it uses default group in the configuration file.
 
+### Claude Code Skill
+
+ExpOven ships a [Claude Code](https://claude.com/claude-code) skill at [`.claude/skills/notify/SKILL.md`](./.claude/skills/notify/SKILL.md) that gives the agent a `/notify` command backed by `ding`. Useful for letting Claude ping you when long-running tasks finish, with ExpOven routing the message to your configured platform(s).
+
+<details><summary>📌 Install the skill</summary>
+
+> **Project-local** (default): if you're working inside a clone of ExpOven, the skill is auto-discovered — no setup needed.
+>
+> **Global** (use from any project): copy or symlink the skill folder into your user-level skills directory.
+> ```shell
+> mkdir -p ~/.claude/skills
+> cp -r .claude/skills/notify ~/.claude/skills/notify
+> # or, to track upstream changes:
+> ln -s "$(pwd)/.claude/skills/notify" ~/.claude/skills/notify
+> ```
+</details><br/>
+
+```shell
+/notify                       # sends "Task complete" via the saved ogroup
+/notify Training finished     # sends that message
+/notify --set-group work      # change the ogroup the skill routes to
+/notify --show-group          # print the currently saved ogroup
+/notify --reset-group         # forget; ask again on the next /notify call
+```
+
+The first time `/notify` is invoked it will ask which ogroup to use (picked from `oven list-ogroups`) and remember the choice in `${OVEN_HOME:-~/.config/oven}/claude-notify-group`.
+
 ## Contributing
 
 Please check [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md) for more details.
